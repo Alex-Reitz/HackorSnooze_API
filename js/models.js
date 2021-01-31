@@ -75,8 +75,17 @@ class StoryList {
     const response = await axios({
       url: `${BASE_URL}/stories`,
       method: "POST",
+      data: { newStory: { username, title, author, url } },
     });
-    return response;
+    return new Story(
+      {
+        username: newStory.username,
+        title: newStory.title,
+        author: newStory.author,
+        url: newStory.url,
+      },
+      response.data.token
+    );
   }
 }
 
@@ -144,9 +153,7 @@ class User {
       method: "POST",
       data: { user: { username, password } },
     });
-
     let { user } = response.data;
-
     return new User(
       {
         username: user.username,
