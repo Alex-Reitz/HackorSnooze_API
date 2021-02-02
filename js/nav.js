@@ -34,3 +34,21 @@ function updateNavOnLogin() {
   $navLogOut.show();
   $navUserProfile.text(`${currentUser.username}`).show();
 }
+
+/* Call this when user clicks add article link in navbar */
+function navSubmitStoryClick(evt) {
+  console.debug("navSubmitStoryClick", evt);
+  hidePageComponents();
+  $allStoriesList.show();
+  $submitForm.show();
+}
+
+$navSubmitStory.on("click", navSubmitStoryClick);
+
+/* Click favorites  */
+
+function updateFavorites(evt) {
+  console.debug("updateFavorites", evt);
+  hidePageComponents();
+  $favoriteStories.show();
+}

@@ -56,10 +56,8 @@ class StoryList {
       url: `${BASE_URL}/stories`,
       method: "GET",
     });
-
     // turn plain old story objects from API into instances of Story class
     const stories = response.data.stories.map((story) => new Story(story));
-
     // build an instance of our own class using the new array of stories
     return new StoryList(stories);
   }
@@ -70,22 +68,19 @@ class StoryList {
    *
    * Returns the new Story instance
    */
-
   async addStory(user, newStory) {
     const response = await axios({
-      url: `${BASE_URL}/stories`,
       method: "POST",
-      data: { newStory: { username, title, author, url } },
-    });
-    return new Story(
-      {
-        username: newStory.username,
-        title: newStory.title,
-        author: newStory.author,
-        url: newStory.url,
+      url: `${BASE_URL}/stories`,
+      data: {
+        token: user.loginToken,
+        story: newStory,
       },
-      response.data.token
-    );
+    });
+    newStory = new Story(response.data.story);
+    this.stories.unshift(newStory);
+    user.ownStories.unshift(newStory.storyId);
+    return newStory;
   }
 }
 
@@ -194,5 +189,38 @@ class User {
       console.error("loginViaStoredCredentials failed", err);
       return null;
     }
+  }
+  /* Favorites */
+  async addFavorite(storyId) {
+    // add favorite at server
+    await axios({
+      url: `${BASE_URL}/users/${this.username}/favorites/${storyId}`,
+      method: "POST",
+      data: {
+        token: this.loginToken,
+      },
+    });
+    // add favorite at local favorites array
+    let favId = storyId;
+    this.favorites.push(favId);
+    return this;
+  }
+
+  async removeFavorite(storyId) {
+    await axios({
+      url: `${BASE_URL}/users/${this.username}/favorites/${storyId}`,
+      method: "POST",
+      data: {
+        token: this.loginToken,
+      },
+    });
+    let favId = storyId;
+    //remove story from favorites array
+    for (var i = 0; i < this.favorites.length; i++) {
+      if (this.favorites[i] === favId) {
+        this.favorites.splice(i, 1);
+      }
+    }
+    return this;
   }
 }

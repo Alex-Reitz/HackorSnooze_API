@@ -11,7 +11,30 @@ async function getAndShowStoriesOnStart() {
 
   putStoriesOnPage();
 }
+/* put listeners on add article form, store values from inputs in variables */
 
+async function submitNewStory(evt) {
+  console.debug("submitNewStory");
+  evt.preventDefault();
+
+  // grab all info from form
+  const title = $("#create-title").val();
+  const url = $("#create-url").val();
+  const author = $("#create-author").val();
+  const username = currentUser.username;
+  const storyData = { title, url, author, username };
+
+  const story = await storyList.addStory(currentUser, storyData);
+
+  const $story = generateStoryMarkup(story);
+  $allStoriesList.prepend($story);
+
+  // hide the form and reset it
+  $submitForm.slideUp("slow");
+  $submitForm.trigger("reset");
+}
+
+$submitForm.on("submit", submitNewStory);
 /**
  * A render method to render HTML for an individual Story instance
  * - story: an instance of Story
@@ -50,3 +73,5 @@ function putStoriesOnPage() {
 
   $allStoriesList.show();
 }
+
+/* Get and show favorites when link is clicked */
